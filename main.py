@@ -13,12 +13,20 @@ pygame.display.set_caption("Space War Game")
 icon = pygame.image.load('ufo.png')
 pygame.display.set_icon(icon)
 
+# Base class for game objects
+class GameObject:
+    def __init__(self, image_path, x, y):
+        self.image = pygame.image.load(image_path)
+        self.x = x
+        self.y = y
+
+    def draw(self):
+        screen.blit(self.image, (self.x, self.y))
+
 # Player class
-class Player:
+class Player(GameObject):
     def __init__(self):
-        self.image = pygame.image.load('player.png')
-        self.x = 350
-        self.y = 500
+        super().__init__('player.png', 350, 500)
         self.x_change = 0
 
     def move(self):
@@ -29,53 +37,38 @@ class Player:
         elif self.x >= 736:
             self.x = 736
 
-    def draw(self):
-        screen.blit(self.image, (self.x, self.y))
-
 # Enemy class
-class Enemy:
+class Enemy(GameObject):
     def __init__(self):
-        self.image = pygame.image.load('enemy.png')
-        self.x = random.randint(0, 736)
-        self.y = random.randint(50, 150)
-        self.x_change = 2
-        self.y_change = 10
+        super().__init__('enemy.png', random.randint(0, 550), random.randint(50, 550))
+        self.x_change = 0.5
+        self.y_change = 5
 
     def move(self):
         self.x += self.x_change
         if self.x <= 0:
-            self.x_change = 2
+            self.x_change = 1
             self.y += self.y_change
         elif self.x >= 736:
-            self.x_change = -2
+            self.x_change = -1
             self.y += self.y_change
 
-    def draw(self):
-        screen.blit(self.image, (self.x, self.y))
-
 # Bullet class
-class Bullet:
+class Bullet(GameObject):
     def __init__(self):
-        self.image = pygame.image.load('bullet.png')
-        self.x = 0
-        self.y = 480
+        super().__init__('bullet.png', 0, 480)
         self.state = "ready"
 
     def fire(self, x):
         self.state = "fire"
         self.x = x
-        self.y = 480
 
     def move(self):
         if self.state == "fire":
             self.y -= 10
             if self.y <= 0:
-                self.y = 480
                 self.state = "ready"
-
-    def draw(self):
-        if self.state == "fire":
-            screen.blit(self.image, (self.x + 16, self.y + 10))
+                self.y = 480
 
 # Function to check collision
 def is_collision(enemy_x, enemy_y, bullet_x, bullet_y):
@@ -92,8 +85,6 @@ def show_score(x, y):
 
 # Game Over font
 over_font = pygame.font.Font('freesansbold.ttf', 64)
-
-# Retry button setup
 retry_font = pygame.font.Font('freesansbold.ttf', 40)
 retry_button_rect = pygame.Rect(300, 350, 200, 50)
 
